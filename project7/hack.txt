@@ -1,0 +1,108 @@
+TITLE project7
+; Xuying He
+; This program decrypted a file that contains encrypted 6 characters using XOR instruction.
+;
+; FOR EXTRA CREDIT: Firstly, I try to decrypt the first character by testing possible combination keys. Once the first character is being decrypted as "L"
+; or "R", the program will stop testing the keys and record the current key. Then I use the Decryption key to decrypt the rest of the characters.
+
+
+INCLUDE Irvine32.inc
+
+
+.data
+BUFFER_SIZE = 6							; only read the first six characters 
+buffer BYTE BUFFER_SIZE DUP(?),0
+
+sEncrypt BYTE  "Cipher text:          ",0
+sDecrypt BYTE  "Decrypted:            ",0
+
+filename BYTE "combination.txt",0
+fileHandle DWORD ?
+
+sSize DWORD ?
+DecryptKey DWORD ?
+
+.code
+main PROC
+	mov edx, OFFSET filename			; open combination.txt file
+	call OpenInputFile						
+
+	mov edx, OFFSET buffer				; store the content of the file into buffer
+	mov ecx, BUFFER_SIZE				
+	call ReadFromFile		
+	mov sSize, eax						; count the bytes reads from the file	
+
+	mov edx, OFFSET sEncrypt			; display encrypted message
+	call WriteString
+
+	mov edx, OFFSET buffer
+	call WriteString					; display the encryption content
+
+	mov esi, OFFSET buffer			
+	call decrpting						; decrypt the first character and find the decrption key
+
+
+	call Crlf
+
+	mov edx, OFFSET sDecrypt			; display decrypted message
+	call WriteString
+
+
+	call Translate						; decrypted the buffer
+
+	mov edx, OFFSET buffer
+	call WriteString
+	
+	call Crlf
+
+	exit
+main ENDP
+
+;-------------------------------------------------
+; Translates the string by exclusive-ORing each
+; byte with the encryption key byte.
+; Receives: None 
+; Returns: None
+;-------------------------------------------------
+Translate PROC
+		pushad
+		mov esi, OFFSET buffer				; set ESI points to the first character of the buffer
+		inc esi								; start translating at the second character since the first is already being translated
+		mov ecx, BUFFER_SIZE-1				; set the counter  = number of bytes in buffer - 1
+		mov ebx, DecryptKey					; set EBX = THE ENCRYPTION KEY
+
+	L1:
+		xor [esi], ebx						; translate a byte
+		inc esi								; move to next byte
+		loop L1				
+
+		popad
+	ret
+Translate ENDP
+
+;-------------------------------------------------
+; Test every possible 8-bit combinations and find
+; the correct encryption key byte
+; Receives: ESI = the address of buffer
+; Returns: DecryptKey = encryption key
+;-------------------------------------------------
+decrpting  PROC
+		pushad
+		mov ebx,1										; starting the possible kay at 0		
+
+		.WHILE ( al != "L" && al != "R") && ebx < 256   ; if the decryption of the first character is "L" or "R" 
+														; and ebx is less than 256, stop the loop.
+			xor [esi], ebx								; translate a first byte
+			inc ebx										; A new key (increment ebx by 1)
+			mov al, [esi]								; store the decryption of the first character in AL	
+		.ENDW
+		call Crlf
+		mov DecryptKey, ebx								; store the decryption key
+		popad
+	ret
+decrpting ENDP
+
+END main
+
+
+

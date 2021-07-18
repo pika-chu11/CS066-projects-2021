@@ -1,0 +1,29 @@
+TITLE project3
+; Xuying He
+; This program calculates the sum of all even integers
+; up to a given positive integer called "limit". 
+; If limit is even it should be included in the sum. 
+; If it is odd, then the summing should stop before the limit.
+
+INCLUDE irvine32.inc
+
+.data
+limit dword 6	;set a limit variable and initialize a value to it
+
+.code
+main PROC
+	mov	ebx, 0		;set ebx to zero
+	mov eax, 0		;set eax to zero
+
+
+	jumping:
+		add	ebx, eax	;add eax to ebx
+		add eax, 2		;every loop increase eax by 2
+		cmp eax, limit	;compare eax and limit
+		jle  jumping	;if eax is <= limit then jump back to jumping
+		
+	call DumpRegs	    ;display registers 
+
+exit
+main ENDP
+END main

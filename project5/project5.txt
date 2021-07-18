@@ -1,0 +1,72 @@
+TITLE project5
+; Xuying He
+; This program transpose any size array by using two procedures.
+
+INCLUDE irvine32.inc
+
+.data
+array1 BYTE "NeverOddOrEven!"
+array2 BYTE "WasItACarOrACatISaw?"
+
+.code
+main PROC
+	mov ecx, LENGTHOF array1		; set the loop counter to the array size
+	mov esi, OFFSET array1			; ESI points to the first character the array
+	call reverse					; reverse the array1
+	call display					; display the array1
+
+	call Crlf						; print \n charater
+
+	mov ecx, LENGTHOF array2		; set the loop counter to the array size
+	mov esi, OFFSET array2			; ESI points to the first character the array
+	call reverse					; reverse the array2
+	call display					; display the array2
+
+
+exit
+main ENDP
+
+;------------------------------------------- 
+; Reversing the array.
+; Receives: ESI = the array offset
+; ECX = number of elements in the array
+;-------------------------------------------
+reverse PROC USES esi ecx
+		mov edi, esi					; EDI points to the end of the array
+		add edi, ecx		
+		dec edi
+
+		mov edx, 0						; Divide the length of the array by 2
+		mov eax, ecx
+		mov ebx, 2
+		div ebx
+		mov ecx, eax					
+	
+
+reversing:
+		mov al, [esi]					; set AL contains the current value from the left side
+		xchg al, [edi]					; exchange the value in AL and the right side of the array
+		mov [esi], al					; set value in the AL to the right side of the array
+		inc esi				 			
+		dec edi              			
+		loop reversing					; keep looping until ECX(counter) = 0
+
+		ret
+reverse ENDP
+
+;-------------------------------------------
+; Display the array
+; Receives: ESI = the array offset
+; ECX = number of elements in the array
+;------------------------------------------- 
+display PROC USES esi ecx	
+print:
+		mov al,[esi]					; set AL = the value of the array
+		inc esi			
+		call writeChar					; call the writeChar function to display the current character in AL.
+		loop print						; keep looping until ECX(counter) = 0
+
+		ret
+display ENDP
+
+END main

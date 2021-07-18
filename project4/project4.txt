@@ -1,0 +1,41 @@
+TITLE project4
+; Xuying He
+; This program transpose a 15 BYTE array.
+
+INCLUDE irvine32.inc
+
+.data
+;string BYTE "NeverOddOrEven!", 0	 ;initialize an 15 BYTE array
+array BYTE 'N','e','v','e','r','O','d','d','O','r','E','v','e','n','!'		;initialize an 15 BYTE array
+
+.code
+main PROC
+	mov ecx, LENGTHOF array/2		; set the loop counter to half of the array size(7)
+	mov esi, OFFSET array			; ESI points to the first character the array
+	mov edi, OFFSET array			; EDI points to the array
+	add edi, SIZEOF array			; Set EDI points the last character in the array
+	sub edi, TYPE array
+
+; Reverse the Array
+topofloop:
+	mov al, [esi]					; set AL contains the current value from the left side
+	xchg al, [edi]					; exchange the value in AL and the right side of the array
+	mov [esi], al					; set value in the AL to the right side of the array
+	add esi, TYPE array				; increment ESI by the unit size of the array TYPE
+	sub edi, TYPE array				; decrement EDI by the unit size of the array TYPE
+	loop topofloop					; keep looping until ECX(counter) = 0
+
+mov ecx, LENGTHOF array				; set the loop counter to the size of array (15)
+mov esi, OFFSET array				; ESI points to the array
+
+; Displaying the array					
+Display:
+	mov al,[esi]					; set AL = the value of the array
+	add esi, TYPE array				; increment ESI by the unit size of the array TYPE
+	call writeChar					; call the writeChar function to display the current character in AL.
+	loop Display					; keep looping until ECX(counter) = 0
+
+
+exit
+main ENDP
+END main
